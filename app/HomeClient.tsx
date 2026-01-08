@@ -17,7 +17,7 @@ import { Reveal } from "@/components/Reveal";
 import { AutoHideHeader } from "@/components/AutoHideHeader";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { CoupleMark } from "@/components/CoupleMark";
-export const dynamic = "fore-dynamic";
+// export const dynamic = "fore-dynamic";
 
 
 function googleCalendarLink() {
