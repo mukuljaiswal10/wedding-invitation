@@ -17,10 +17,7 @@ import { Reveal } from "@/components/Reveal";
 import { AutoHideHeader } from "@/components/AutoHideHeader";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { CoupleMark } from "@/components/CoupleMark";
-
-// function googleCalendarLink() {
-//   return "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Wedding%20Celebration&details=Join%20us%20for%20the%20wedding&location=Venue&dates=20260224T133000Z/20260224T173000Z";
-// }
+export const dynamic = "fore-dynamic";
 
 
 function googleCalendarLink() {
