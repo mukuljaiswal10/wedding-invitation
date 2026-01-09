@@ -808,3 +808,10 @@ body[data-theme="traditional"] {
     animation: none !important;
   }
 }
+
+
+
+nextjs-portal
+{
+  display: none !important;
+}
