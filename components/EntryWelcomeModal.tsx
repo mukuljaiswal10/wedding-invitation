@@ -101,6 +101,7 @@
 
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 type Props = {
     open: boolean;
@@ -145,6 +146,9 @@ export default function EntryWelcomeModal({ open, onClose, autoCloseMs = 15000 }
                     </button>
 
                     <div className="p-7 md:p-8">
+                        <div className="flex justify-content-center">
+                            <Image src="/g.png" alt="Ganesh" width={158} height={158} className="mx-auto" />
+                        </div>
                         <p className="text-[11px] tracking-[0.28em] text-[#d6a855]/90">
                             WELCOME • WEDDING INVITATION
                         </p>
