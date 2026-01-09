@@ -564,7 +564,7 @@ export default function HomeClient() {
 
                                 <span className="inline-flex items-center gap-2">
                                     <span className="h-1.5 w-1.5 rounded-full bg-gold/70" />
-                                    Built by <span className="text-white/75">Mukul Jaiswal</span>
+                                    Designed & Developed by<span className="text-white/75">Mukul Jaiswal · Full-Stack Developer</span>
                                 </span>
                             </div>
 
