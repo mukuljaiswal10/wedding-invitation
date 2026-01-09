@@ -454,3 +454,357 @@ html {
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+.bg-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background: radial-gradient(
+      900px 520px at 18% 22%,
+      rgba(214, 168, 85, 0.14),
+      transparent 60%
+    ),
+    radial-gradient(
+      740px 420px at 82% 28%,
+      rgba(255, 255, 255, 0.08),
+      transparent 60%
+    ),
+    radial-gradient(
+      820px 520px at 55% 78%,
+      rgba(214, 168, 85, 0.1),
+      transparent 62%
+    ),
+    radial-gradient(
+      520px 320px at 88% 82%,
+      rgba(255, 255, 255, 0.06),
+      transparent 60%
+    );
+  animation: ambientBreath 8s ease-in-out infinite;
+}
+
+/* sparkles */
+.bg-ambient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      circle at 10% 20%,
+      rgba(214, 168, 85, 0.28) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 35% 45%,
+      rgba(255, 255, 255, 0.16) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 68% 30%,
+      rgba(214, 168, 85, 0.22) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 80% 72%,
+      rgba(255, 255, 255, 0.14) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 52% 85%,
+      rgba(214, 168, 85, 0.2) 0 1px,
+      transparent 2px
+    );
+  opacity: 0.7;
+  filter: blur(0.2px);
+  animation: sparkleDrift 14s linear infinite;
+}
+
+/* shimmer sweep */
+.bg-ambient::after {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(214, 168, 85, 0.06) 45%,
+    rgba(214, 168, 85, 0.14) 50%,
+    rgba(214, 168, 85, 0.06) 55%,
+    transparent 100%
+  );
+  transform: translateX(-40%);
+  mix-blend-mode: screen;
+  animation: shimmerSweep 9s ease-in-out infinite;
+  opacity: 0.85;
+}
+
+@keyframes ambientBreath {
+  0%,
+  100% {
+    filter: saturate(1) brightness(1);
+    opacity: 1;
+  }
+  50% {
+    filter: saturate(1.05) brightness(1.08);
+    opacity: 0.97;
+  }
+}
+
+@keyframes sparkleDrift {
+  0% {
+    transform: translate3d(-1.5%, -1%, 0);
+  }
+  100% {
+    transform: translate3d(1.5%, 1%, 0);
+  }
+}
+
+@keyframes shimmerSweep {
+  0% {
+    transform: translateX(-45%);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateX(45%);
+    opacity: 0.45;
+  }
+  100% {
+    transform: translateX(45%);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-ambient,
+  .bg-ambient::before,
+  .bg-ambient::after {
+    animation: none !important;
+  }
+}
+
+/* overlay layer */
+.falling-flowers {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* falling outer */
+.petal {
+  position: absolute;
+  top: -12%;
+  will-change: transform, opacity;
+  transform: translate3d(0, -80px, 0);
+  animation-name: petalFall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* inner: sway + rotate + glow */
+.petalInner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-image: url("/flower.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 0 12px rgba(214, 168, 85, 0.35));
+  animation: petalSway 2.6s ease-in-out infinite;
+  transform: translateZ(0);
+}
+
+@keyframes petalFall {
+  0% {
+    transform: translate3d(0, -120px, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 110vh, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes petalSway {
+  0%,
+  100% {
+    transform: translateX(-18px) rotate(-18deg);
+  }
+  50% {
+    transform: translateX(18px) rotate(18deg);
+  }
+}
+
+/* Royal twinkle stars (blink) */
+.royal-twinkle {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      circle at 12% 18%,
+      rgba(255, 255, 255, 0.18) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 28% 62%,
+      rgba(214, 168, 85, 0.22) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 55% 25%,
+      rgba(255, 255, 255, 0.14) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 78% 48%,
+      rgba(214, 168, 85, 0.18) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 86% 78%,
+      rgba(255, 255, 255, 0.12) 0 1px,
+      transparent 2px
+    );
+  opacity: 0.8;
+  animation: twinkleBlink 2.2s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes twinkleBlink {
+  0%,
+  100% {
+    opacity: 0.35;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.9;
+    filter: brightness(1.25);
+  }
+}
+
+/* reduced motion respect */
+@media (prefers-reduced-motion: reduce) {
+  .petal,
+  .petalInner,
+  .royal-twinkle {
+    animation: none !important;
+  }
+}
+
+/* ========= THEME SWITCH ========= */
+/* body: data-theme="royal" OR data-theme="traditional" */
+
+body[data-theme="royal"] {
+  --petal-img: url("/flower-gold.svg");
+  --glow: rgba(214, 168, 85, 0.42);
+  --twinkle-a: rgba(255, 255, 255, 0.18);
+  --twinkle-b: rgba(214, 168, 85, 0.24);
+}
+
+body[data-theme="traditional"] {
+  --petal-img: url("/marigold.svg");
+  --glow: rgba(255, 170, 0, 0.45);
+  --twinkle-a: rgba(255, 215, 160, 0.22);
+  --twinkle-b: rgba(255, 135, 0, 0.22);
+}
+
+/* ========= FALLING FLOWERS OVERLAY ========= */
+.falling-flowers {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.petal {
+  position: absolute;
+  top: -12%;
+  will-change: transform, opacity;
+  transform: translate3d(0, -80px, 0);
+  animation-name: petalFall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.petalInner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-image: var(--petal-img);
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 0 14px var(--glow));
+  animation: petalSway 2.6s ease-in-out infinite;
+  transform: translateZ(0);
+}
+
+@keyframes petalFall {
+  0% {
+    transform: translate3d(0, -130px, 0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 110vh, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes petalSway {
+  0%,
+  100% {
+    transform: translateX(-18px) rotate(-18deg);
+  }
+  50% {
+    transform: translateX(18px) rotate(18deg);
+  }
+}
+
+/* ========= TWINKLE / WARM LIGHTS LAYER ========= */
+.twinkleLayer {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      circle at 12% 18%,
+      var(--twinkle-a) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(circle at 28% 62%, var(--twinkle-b) 0 1px, transparent 2px),
+    radial-gradient(circle at 55% 25%, var(--twinkle-a) 0 1px, transparent 2px),
+    radial-gradient(circle at 78% 48%, var(--twinkle-b) 0 1px, transparent 2px),
+    radial-gradient(circle at 86% 78%, var(--twinkle-a) 0 1px, transparent 2px),
+    radial-gradient(circle at 18% 82%, var(--twinkle-b) 0 1px, transparent 2px);
+  opacity: 0.9;
+  animation: twinkleBlink 2.2s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes twinkleBlink {
+  0%,
+  100% {
+    opacity: 0.35;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.95;
+    filter: brightness(1.25);
+  }
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .petal,
+  .petalInner,
+  .twinkleLayer {
+    animation: none !important;
+  }
+}

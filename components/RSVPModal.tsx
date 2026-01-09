@@ -448,12 +448,12 @@ export function RSVPModal({
                             />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3">
+                        {/* <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => setAttending("Yes")}
                                 className={`rounded-xl border px-4 py-3 text-sm transition ${attending === "Yes"
-                                        ? "border-gold/40 bg-gold/15"
-                                        : "border-white/10 bg-white/5 hover:bg-white/10"
+                                    ? "border-gold/40 bg-gold/15"
+                                    : "border-white/10 bg-white/5 hover:bg-white/10"
                                     }`}
                             >
                                 Yes, I’m coming
@@ -461,15 +461,15 @@ export function RSVPModal({
                             <button
                                 onClick={() => setAttending("No")}
                                 className={`rounded-xl border px-4 py-3 text-sm transition ${attending === "No"
-                                        ? "border-gold/40 bg-gold/15"
-                                        : "border-white/10 bg-white/5 hover:bg-white/10"
+                                    ? "border-gold/40 bg-gold/15"
+                                    : "border-white/10 bg-white/5 hover:bg-white/10"
                                     }`}
                             >
                                 Sorry, can’t
                             </button>
-                        </div>
+                        </div> */}
 
-                        <div>
+                        {/* <div>
                             <label className="text-xs text-white/70">Guests</label>
                             <input
                                 type="number"
@@ -479,7 +479,7 @@ export function RSVPModal({
                                 onChange={(e) => setGuests(Number(e.target.value))}
                                 className="mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-gold/40"
                             />
-                        </div>
+                        </div> */}
 
                         <div className="mt-2 flex flex-wrap gap-3">
                             <Button size="lg" onClick={saveRsvp} disabled={saving}>
