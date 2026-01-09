@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`relative ${display.variable} ${body.variable} font-body`}>
+      <body data-theme="royal" className={`relative ${display.variable} ${body.variable} font-body`}>
         <div className="bg-ambient" aria-hidden="true" />
         <FallingFlowers />
         <div className="relative z-1">{children}</div>
