@@ -1,259 +1,34 @@
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import { Volume2, VolumeX, Sparkles } from "lucide-react";
-// import { Button } from "@/components/Button";
-
-// const MUTED_KEY = "invite_music_muted_v2";
-// const EVT = "invite-music-sync-v2";
-
-// declare global {
-//     interface Window {
-//         __INVITE_AUDIO__?: HTMLAudioElement;
-//         __INVITE_AUDIO_SRC__?: string;
-//         __INVITE_MUTED__?: boolean;
-//         __INVITE_AUTOPLAY_BLOCKED__?: boolean;
-//     }
-// }
-
-// function getOrCreateAudio(src: string) {
-//     if (window.__INVITE_AUDIO__ && window.__INVITE_AUDIO_SRC__ === src) return window.__INVITE_AUDIO__;
-
-//     if (window.__INVITE_AUDIO__) {
-//         const a = window.__INVITE_AUDIO__;
-//         if (window.__INVITE_AUDIO_SRC__ !== src) {
-//             a.src = src;
-//             window.__INVITE_AUDIO_SRC__ = src;
-//         }
-//         a.loop = true;
-//         a.preload = "auto";
-//         a.volume = 0.55;
-//         return a;
-//     }
-
-//     const a = new Audio(src);
-//     a.loop = true;
-//     a.preload = "auto";
-//     a.volume = 0.55;
-//     window.__INVITE_AUDIO__ = a;
-//     window.__INVITE_AUDIO_SRC__ = src;
-//     return a;
-// }
-
-// function readMuted(): boolean {
-//     try {
-//         return localStorage.getItem(MUTED_KEY) === "1";
-//     } catch {
-//         return false;
-//     }
-// }
-// function writeMuted(m: boolean) {
-//     try {
-//         if (m) localStorage.setItem(MUTED_KEY, "1");
-//         else localStorage.removeItem(MUTED_KEY);
-//     } catch { }
-// }
-
-// function broadcastMuted(muted: boolean) {
-//     window.__INVITE_MUTED__ = muted;
-//     window.dispatchEvent(new CustomEvent(EVT, { detail: { muted } }));
-// }
-
-// async function hardPlay(src: string) {
-//     const a = getOrCreateAudio(src);
-//     a.muted = false;
-//     a.volume = 0.55;
-//     await a.play();
-// }
-
-// function hardStop(src: string) {
-//     const a = getOrCreateAudio(src);
-//     try {
-//         a.pause();
-//     } catch { }
-//     a.muted = true;
-// }
-
-// export function MusicToggle({ src }: { src: string }) {
-//     const [muted, setMuted] = useState(true);
-//     const [showOverlay, setShowOverlay] = useState(false);
-
-//     // init
-//     useEffect(() => {
-//         getOrCreateAudio(src);
-
-//         // priority: global -> storage -> default ON
-//         const initialMuted =
-//             typeof window.__INVITE_MUTED__ === "boolean" ? window.__INVITE_MUTED__! : readMuted();
-
-//         setMuted(initialMuted);
-//         broadcastMuted(initialMuted);
-
-//         // default behavior:
-//         // - if muted => stop
-//         // - else => attempt autoplay, if blocked => show overlay
-//         if (initialMuted) {
-//             hardStop(src);
-//             setShowOverlay(false);
-//             window.__INVITE_AUTOPLAY_BLOCKED__ = false;
-//         } else {
-//             (async () => {
-//                 try {
-//                     await hardPlay(src);
-//                     setShowOverlay(false);
-//                     window.__INVITE_AUTOPLAY_BLOCKED__ = false;
-//                 } catch {
-//                     // autoplay blocked: show overlay to start with 1 tap
-//                     window.__INVITE_AUTOPLAY_BLOCKED__ = true;
-//                     setShowOverlay(true);
-//                 }
-//             })();
-//         }
-
-//         const onSync = (e: Event) => {
-//             const d = (e as CustomEvent<{ muted: boolean }>).detail;
-//             setMuted(d.muted);
-//             // If muted updated from other toggle
-//             if (d.muted) {
-//                 hardStop(src);
-//                 setShowOverlay(false);
-//             }
-//         };
-//         window.addEventListener(EVT, onSync as any);
-//         return () => window.removeEventListener(EVT, onSync as any);
-//     }, [src]);
-
-//     // Strict toggle
-//     const toggle = async () => {
-//         const nextMuted = !muted;
-//         writeMuted(nextMuted);
-
-//         if (nextMuted) {
-//             hardStop(src);
-//             setMuted(true);
-//             broadcastMuted(true);
-//             setShowOverlay(false);
-//             window.__INVITE_AUTOPLAY_BLOCKED__ = false;
-//             return;
-//         }
-
-//         // unmute: user click => should allow play
-//         setMuted(false);
-//         broadcastMuted(false);
-
-//         try {
-//             await hardPlay(src);
-//             setShowOverlay(false);
-//             window.__INVITE_AUTOPLAY_BLOCKED__ = false;
-//         } catch {
-//             // if still blocked (rare), keep overlay
-//             window.__INVITE_AUTOPLAY_BLOCKED__ = true;
-//             setShowOverlay(true);
-//         }
-//     };
-
-//     // overlay start action (guaranteed user gesture)
-//     const startSoundNow = async () => {
-//         writeMuted(false);
-//         setMuted(false);
-//         broadcastMuted(false);
-
-//         try {
-//             await hardPlay(src);
-//             setShowOverlay(false);
-//             window.__INVITE_AUTOPLAY_BLOCKED__ = false;
-//         } catch {
-//             // if still fails, just hide overlay to avoid loop
-//             setShowOverlay(false);
-//         }
-//     };
-
-//     const dismissOverlay = () => {
-//         // user doesn't want sound now -> treat as muted for this user
-//         writeMuted(true);
-//         hardStop(src);
-//         setMuted(true);
-//         broadcastMuted(true);
-//         setShowOverlay(false);
-//         window.__INVITE_AUTOPLAY_BLOCKED__ = false;
-//     };
-
-//     return (
-//         <>
-//             {/* Toggle button */}
-//             <button
-//                 onClick={toggle}
-//                 className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/80 hover:bg-white/10 transition focus-ring inline-flex items-center gap-2"
-//                 aria-label={muted ? "Turn music on" : "Turn music off"}
-//                 title={muted ? "Music Off (tap to unmute)" : "Music On (tap to mute)"}
-//             >
-//                 {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-//                 <span className="leading-none">
-//                     Music <span className="text-white/60">{muted ? "Off" : "On"}</span>
-//                 </span>
-//             </button>
-
-//             {/* ✅ Autoplay blocked overlay (only when needed) */}
-//             {showOverlay && !muted && (
-//                 <div className="fixed inset-0 z-[80] grid place-items-center bg-black/55 px-4">
-//                     <div className="glass w-full max-w-md p-5 sm:p-6">
-//                         <div className="flex items-start gap-3">
-//                             <div className="rounded-xl border border-white/10 bg-white/5 p-2">
-//                                 <Sparkles size={18} className="text-gold/90" />
-//                             </div>
-
-//                             <div className="flex-1">
-//                                 <div className="text-sm font-medium text-white/90">
-//                                     Tap to start music ✨
-//                                 </div>
-//                                 <p className="mt-1 text-xs text-white/65">
-//                                     Your browser blocked autoplay. One tap will enable sound.
-//                                 </p>
-
-//                                 <div className="mt-4 flex flex-wrap gap-2">
-//                                     <Button onClick={startSoundNow}>Start Music</Button>
-//                                     <Button variant="secondary" onClick={dismissOverlay}>
-//                                         Keep Muted
-//                                     </Button>
-//                                 </div>
-//                             </div>
-//                         </div>
-
-//                         <div className="relative mt-4 h-px w-full overflow-hidden bg-white/10">
-//                             <span className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-gold/70 to-transparent animate-sheen" />
-//                         </div>
-//                     </div>
-//                 </div>
-//             )}
-//         </>
-//     );
-// }
-
-
-
-
-
-
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Volume2, VolumeX } from "lucide-react";
 
-export function MusicToggle({ src }: { src: string }) {
+export function MusicToggle({
+    src,
+    promptOnLoad,
+}: {
+    src: string;
+    promptOnLoad?: boolean;
+}) {
     const audioRef = useRef<HTMLAudioElement | null>(null);
+
     const [isOn, setIsOn] = useState(false);
     const [blocked, setBlocked] = useState(false);
     const [shake, setShake] = useState(false);
+
+    // ✅ Start Music / Keep Muted prompt modal
+    const [promptOpen, setPromptOpen] = useState(false);
+
+    // ✅ Portal safe (SSR)
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
 
     useEffect(() => {
         const a = new Audio(src);
         a.loop = true;
         a.volume = 0.6;
         audioRef.current = a;
-
-        // optional: if you want remember state
-        // const saved = localStorage.getItem("music_on") === "1";
-        // if (saved) a.play().then(()=>setIsOn(true)).catch(()=>setBlocked(true));
 
         return () => {
             a.pause();
@@ -267,12 +42,9 @@ export function MusicToggle({ src }: { src: string }) {
             await audioRef.current?.play();
             setIsOn(true);
             setBlocked(false);
-            // localStorage.setItem("music_on","1");
         } catch {
-            // iOS / browsers block autoplay unless user gesture
             setBlocked(true);
             setIsOn(false);
-            // localStorage.setItem("music_on","0");
         }
     };
 
@@ -283,7 +55,6 @@ export function MusicToggle({ src }: { src: string }) {
         a.currentTime = 0;
         setIsOn(false);
         setBlocked(false);
-        // localStorage.setItem("music_on","0");
     };
 
     const toggle = async () => {
@@ -296,8 +67,37 @@ export function MusicToggle({ src }: { src: string }) {
         }
     };
 
+    // ✅ Trigger prompt AFTER entry modal closes
+    useEffect(() => {
+        if (!promptOnLoad) return;
+
+        // ✅ always show on refresh/open
+        setPromptOpen(true);
+    }, [promptOnLoad]);
+
+    // ✅ Click actions should instantly "enter" website (close modal)
+    const handleStart = async () => {
+        setPromptOpen(false);     // ✅ close instantly
+        setBlocked(false);
+
+        // ✅ let modal close paint first, then play
+        setTimeout(() => {
+            play();
+        }, 0);
+    };
+
+    const handleMuted = () => {
+        setPromptOpen(false);     // ✅ close instantly
+
+        // ✅ let modal close paint first, then stop
+        setTimeout(() => {
+            stop();
+        }, 0);
+    };
+
     return (
         <div className="relative">
+            {/* Button */}
             <button
                 type="button"
                 onClick={toggle}
@@ -308,7 +108,6 @@ export function MusicToggle({ src }: { src: string }) {
                 ].join(" ")}
                 aria-label={isOn ? "Mute music" : "Play music"}
             >
-                {/* Icon + animation */}
                 <span className="lux-music-iconWrap">
                     {isOn ? (
                         <>
@@ -324,27 +123,97 @@ export function MusicToggle({ src }: { src: string }) {
                     )}
                 </span>
 
+                {/* Premium label */}
                 <span className="lux-music-text">
                     {isOn ? (
                         <span className="inline-flex items-center gap-2">
                             <span className="lux-live-dot" />
-                            <span>Sound</span>
+                            <span>🎵</span>
                         </span>
                     ) : (
                         <span className="inline-flex items-center gap-2">
                             <span className="lux-muted-dot" />
-                            <span>Muted</span>
+                            <span>🔇</span>
                         </span>
                     )}
                 </span>
             </button>
 
-            {/* small tooltip when blocked */}
+            {/* Tooltip when autoplay blocked */}
             {blocked ? (
                 <div className="lux-music-tip">
                     Tap to start music ✨ (Browser blocked autoplay)
                 </div>
             ) : null}
+
+            {/* ✅ Start Music / Keep Muted Prompt Modal (Portal) */}
+            {promptOpen && mounted
+                ? createPortal(
+                    <div className="fixed inset-0 z-[99999]">
+                        {/* ✅ Less dark (more website visible) */}
+                        <div
+                            className="absolute inset-0 bg-black/85 backdrop-blur-3xl"
+                            onClick={() => setPromptOpen(false)}
+                        />
+                        {/* ✅ Soft vignette only (light) */}
+                        <div className="pointer-events-none absolute inset-0 [background:radial-gradient(60%_45%_at_50%_20%,rgba(0,0,0,0),rgba(0,0,0,0.25)_70%,rgba(0,0,0,0.35)_100%)]" />
+
+                        {/* Modal position */}
+                        <div className="absolute inset-0 flex items-start justify-center p-4 pt-28 sm:pt-32">
+                            <div className="relative w-full max-w-[520px] overflow-hidden rounded-3xl border border-white/12 bg-white/[0.10] shadow-2xl">
+                                <div className="pointer-events-none absolute inset-0 entry-sparkle opacity-55" />
+                                <div className="pointer-events-none absolute inset-0 entry-shimmer opacity-45" />
+                                <div className="pointer-events-none absolute left-1/2 top-0 h-[2px] w-[min(420px,78%)] -translate-x-1/2 entry-ribbon" />
+
+                                <button
+                                    onClick={() => setPromptOpen(false)}
+                                    className="absolute right-3 top-3 rounded-full border border-white/15 bg-black/35 px-3 py-1.5 text-xs text-white/90 hover:bg-black/50"
+                                >
+                                    ✕ Close
+                                </button>
+
+                                <div className="p-7 md:p-8">
+                                    <p className="text-[11px] tracking-[0.28em] text-[#d6a855]/90">
+                                        EXPERIENCE • MUSIC
+                                    </p>
+
+                                    <h3 className="mt-2 text-2xl font-semibold text-white">
+                                        Background Music 🎶
+                                    </h3>
+
+                                    <p className="mt-3 text-white/75 leading-relaxed">
+                                        क्या आप वेबसाइट अनुभव के लिए बैकग्राउंड म्यूज़िक चालू करना चाहेंगे?
+                                        आप इसे कभी भी ऊपर दिए गए toggle से mute कर सकते हैं।
+                                    </p>
+
+                                    <div className="mt-6 flex gap-3">
+                                        {/* ✅ On click: start music + instantly enter (close modal) */}
+                                        <button
+                                            onClick={handleStart}
+                                            className="flex-1 rounded-full bg-[#d6a855] px-5 py-2 text-sm font-semibold text-black hover:opacity-95"
+                                        >
+                                            ▶️ Start Music
+                                        </button>
+
+                                        {/* ✅ On click: keep muted + instantly enter (close modal) */}
+                                        <button
+                                            onClick={handleMuted}
+                                            className="flex-1 rounded-full border border-white/18 bg-black/25 px-5 py-2 text-sm font-semibold text-white/90 hover:bg-black/35"
+                                        >
+                                            🔇 Keep Muted
+                                        </button>
+                                    </div>
+
+                                    <div className="mt-4 text-xs text-white/55">
+                                        Note: iPhone पर music start करने के लिए tap जरूरी होता है.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>,
+                    document.body
+                )
+                : null}
         </div>
     );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/Button";
 import { MusicToggle } from "@/components/MusicToggle";
 import { Leaf, Sun, Music, Gem, Sparkles } from "lucide-react";
@@ -21,11 +21,14 @@ export function LuxHeader({
     onRSVP,
     musicSrc,
     events,
+    musicPromptAfterIntro,
 }: {
     couple: string;
     onRSVP: () => void;
     musicSrc?: string;
     events?: TickerEvent[];
+    /** ✅ when true, MusicToggle shows "Start Music / Keep Muted" prompt (inside MusicToggle) */
+    musicPromptAfterIntro?: boolean;
 }) {
     const safeEvents: TickerEvent[] = useMemo(
         () =>
@@ -39,6 +42,22 @@ export function LuxHeader({
                 ],
         [events]
     );
+
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const m = window.matchMedia("(max-width: 639px)"); // tailwind sm breakpoint
+        const onChange = () => setIsMobile(m.matches);
+        onChange();
+
+        if (m.addEventListener) m.addEventListener("change", onChange);
+        else m.addListener(onChange);
+
+        return () => {
+            if (m.removeEventListener) m.removeEventListener("change", onChange);
+            else m.removeListener(onChange);
+        };
+    }, []);
 
     // ✅ pause ONLY on long-press (so normal scroll won't freeze ticker)
     const [paused, setPaused] = useState(false);
@@ -55,6 +74,7 @@ export function LuxHeader({
         setPaused(false);
     };
 
+
     return (
         <header className="container-shell pt-5 sticky top-0 z-40">
             <div className="glass px-4 py-3 sm:px-5 sm:py-4">
@@ -70,7 +90,10 @@ export function LuxHeader({
                     <div className="text-center">
                         <div className="font-display text-lg sm:text-xl leading-none drop-shadow-[0_0_18px_rgba(214,175,97,0.18)]">
                             {(() => {
-                                const parts = couple.split(/×|x|X/).map((s) => s.trim()).filter(Boolean);
+                                const parts = couple
+                                    .split(/×|x|X/)
+                                    .map((s) => s.trim())
+                                    .filter(Boolean);
                                 if (parts.length < 2) return <span>{couple}</span>;
                                 return (
                                     <span className="inline-flex items-center justify-center flex-wrap gap-y-1">
@@ -97,10 +120,17 @@ export function LuxHeader({
                     {/* Right */}
                     <div className="flex justify-end items-center gap-2">
                         <div className="flex gap-2">
-                            <a href="#events"><Button variant="ghost">Events</Button></a>
-                            <a href="#venue"><Button variant="ghost">Venue</Button></a>
+                            <a href="#events">
+                                <Button variant="ghost">Events</Button>
+                            </a>
+                            <a href="#venue">
+                                <Button variant="ghost">Venue</Button>
+                            </a>
                         </div>
-                        {musicSrc ? <MusicToggle src={musicSrc} /> : null}
+
+                        {musicSrc && !isMobile ? (
+                            <MusicToggle src={musicSrc} promptOnLoad={musicPromptAfterIntro} />
+                        ) : null}
                         <Button onClick={onRSVP}>RSVP</Button>
                     </div>
                 </div>
@@ -111,7 +141,10 @@ export function LuxHeader({
                     <div className="text-center">
                         <div className="font-display text-[17px] leading-tight drop-shadow-[0_0_18px_rgba(214,175,97,0.18)]">
                             {(() => {
-                                const parts = couple.split(/×|x|X/).map((s) => s.trim()).filter(Boolean);
+                                const parts = couple
+                                    .split(/×|x|X/)
+                                    .map((s) => s.trim())
+                                    .filter(Boolean);
                                 if (parts.length < 2) return <span>{couple}</span>;
                                 return (
                                     <span className="inline-flex items-center justify-center flex-wrap gap-y-1">
@@ -157,17 +190,27 @@ export function LuxHeader({
                     {/* Actions */}
                     <div className="mt-3 flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                            <a href="#events" className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/80 hover:bg-white/10 transition focus-ring">
+                            <a
+                                href="#events"
+                                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/80 hover:bg-white/10 transition focus-ring"
+                            >
                                 Events
                             </a>
-                            <a href="#venue" className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/80 hover:bg-white/10 transition focus-ring">
+                            <a
+                                href="#venue"
+                                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/80 hover:bg-white/10 transition focus-ring"
+                            >
                                 Venue
                             </a>
                         </div>
 
                         <div className="flex items-center gap-2">
-                            {musicSrc ? <MusicToggle src={musicSrc} /> : null}
-                            <Button onClick={onRSVP} className="px-4">RSVP</Button>
+                            {musicSrc && isMobile ? (
+                                <MusicToggle src={musicSrc} promptOnLoad={musicPromptAfterIntro} />
+                            ) : null}
+                            <Button onClick={onRSVP} className="px-4">
+                                RSVP
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -181,14 +224,30 @@ export function LuxHeader({
 function tintClasses(kind: EventKind) {
     switch (kind) {
         case "mehndi":
-            return { icon: "text-emerald-300/95", glow: "shadow-[0_0_18px_rgba(16,185,129,0.22)]", dot: "bg-emerald-300/70" };
+            return {
+                icon: "text-emerald-300/95",
+                glow: "shadow-[0_0_18px_rgba(16,185,129,0.22)]",
+                dot: "bg-emerald-300/70",
+            };
         case "haldi":
-            return { icon: "text-yellow-300/95", glow: "shadow-[0_0_18px_rgba(250,204,21,0.24)]", dot: "bg-yellow-300/70" };
+            return {
+                icon: "text-yellow-300/95",
+                glow: "shadow-[0_0_18px_rgba(250,204,21,0.24)]",
+                dot: "bg-yellow-300/70",
+            };
         case "sangeet":
-            return { icon: "text-fuchsia-300/95", glow: "shadow-[0_0_18px_rgba(217,70,239,0.22)]", dot: "bg-fuchsia-300/70" };
+            return {
+                icon: "text-fuchsia-300/95",
+                glow: "shadow-[0_0_18px_rgba(217,70,239,0.22)]",
+                dot: "bg-fuchsia-300/70",
+            };
         case "wedding":
         default:
-            return { icon: "text-gold/95", glow: "shadow-[0_0_18px_rgba(214,175,97,0.22)]", dot: "bg-gold/80" };
+            return {
+                icon: "text-gold/95",
+                glow: "shadow-[0_0_18px_rgba(214,175,97,0.22)]",
+                dot: "bg-gold/80",
+            };
     }
 }
 
@@ -196,11 +255,36 @@ function iconFor(kind: EventKind) {
     const t = tintClasses(kind);
     const common = `h-7 w-7 rounded-full border border-white/10 bg-white/5 flex items-center justify-center ${t.glow}`;
     switch (kind) {
-        case "mehndi": return <span className={common}><Leaf size={14} className={t.icon} /></span>;
-        case "haldi": return <span className={common}><Sun size={14} className={t.icon} /></span>;
-        case "sangeet": return <span className={common}><Music size={14} className={t.icon} /></span>;
-        case "wedding": return <span className={common}><Gem size={14} className={t.icon} /></span>;
-        default: return <span className={common}><Sparkles size={14} className="text-gold/95" /></span>;
+        case "mehndi":
+            return (
+                <span className={common}>
+                    <Leaf size={14} className={t.icon} />
+                </span>
+            );
+        case "haldi":
+            return (
+                <span className={common}>
+                    <Sun size={14} className={t.icon} />
+                </span>
+            );
+        case "sangeet":
+            return (
+                <span className={common}>
+                    <Music size={14} className={t.icon} />
+                </span>
+            );
+        case "wedding":
+            return (
+                <span className={common}>
+                    <Gem size={14} className={t.icon} />
+                </span>
+            );
+        default:
+            return (
+                <span className={common}>
+                    <Sparkles size={14} className="text-gold/95" />
+                </span>
+            );
     }
 }
 
@@ -211,14 +295,20 @@ function TickerRow({ events }: { events: TickerEvent[] }) {
                 <span key={`${e.kind}-${idx}`} className="inline-flex items-center gap-3">
                     <TickerItem icon={iconFor(e.kind)} dotClass={tintClasses(e.kind).dot}>
                         <span className="text-white/85">{e.title}</span>
-                        <span className="text-white/55">{e.date} • {e.time}</span>
+                        <span className="text-white/55">
+                            {e.date} • {e.time}
+                        </span>
                     </TickerItem>
                     <Dot />
                 </span>
             ))}
 
             <TickerItem
-                icon={<span className="h-7 w-7 rounded-full border border-white/10 bg-white/5 flex items-center justify-center shadow-[0_0_18px_rgba(214,175,97,0.18)]"><Sparkles size={14} className="text-gold/95" /></span>}
+                icon={
+                    <span className="h-7 w-7 rounded-full border border-white/10 bg-white/5 flex items-center justify-center shadow-[0_0_18px_rgba(214,175,97,0.18)]">
+                        <Sparkles size={14} className="text-gold/95" />
+                    </span>
+                }
                 dotClass="bg-gold/80"
             >
                 <span className="text-white/85">Venue</span>
@@ -226,7 +316,11 @@ function TickerRow({ events }: { events: TickerEvent[] }) {
             </TickerItem>
             <Dot />
             <TickerItem
-                icon={<span className="h-7 w-7 rounded-full border border-white/10 bg-white/5 flex items-center justify-center shadow-[0_0_18px_rgba(214,175,97,0.18)]"><Sparkles size={14} className="text-gold/95" /></span>}
+                icon={
+                    <span className="h-7 w-7 rounded-full border border-white/10 bg-white/5 flex items-center justify-center shadow-[0_0_18px_rgba(214,175,97,0.18)]">
+                        <Sparkles size={14} className="text-gold/95" />
+                    </span>
+                }
                 dotClass="bg-gold/80"
             >
                 <span className="text-white/85">RSVP</span>
@@ -238,7 +332,15 @@ function TickerRow({ events }: { events: TickerEvent[] }) {
     );
 }
 
-function TickerItem({ icon, children, dotClass }: { icon: ReactNode; children: ReactNode; dotClass: string }) {
+function TickerItem({
+    icon,
+    children,
+    dotClass,
+}: {
+    icon: ReactNode;
+    children: ReactNode;
+    dotClass: string;
+}) {
     return (
         <span className="inline-flex items-center gap-3">
             {icon}
