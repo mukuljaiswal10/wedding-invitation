@@ -809,9 +809,348 @@ body[data-theme="traditional"] {
   }
 }
 
-
-
-nextjs-portal
-{
+nextjs-portal {
   display: none !important;
+}
+
+.entry-shimmer {
+  background: linear-gradient(
+    110deg,
+    transparent 0%,
+    rgba(214, 168, 85, 0.08) 35%,
+    rgba(214, 168, 85, 0.16) 50%,
+    rgba(214, 168, 85, 0.08) 65%,
+    transparent 100%
+  );
+  transform: translateX(-40%);
+  animation: entryShimmer 2.4s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes entryShimmer {
+  0% {
+    transform: translateX(-55%);
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(55%);
+    opacity: 0.6;
+  }
+}
+
+.entry-sparkle {
+  background: radial-gradient(
+      circle at 18% 28%,
+      rgba(214, 168, 85, 0.28),
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 70% 35%,
+      rgba(255, 255, 255, 0.12),
+      transparent 42%
+    ),
+    radial-gradient(circle at 42% 78%, rgba(214, 168, 85, 0.2), transparent 45%),
+    radial-gradient(
+      circle at 86% 82%,
+      rgba(255, 255, 255, 0.1),
+      transparent 40%
+    );
+  filter: blur(0.2px);
+  animation: entrySparkle 3.2s ease-in-out infinite;
+}
+
+@keyframes entrySparkle {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+}
+
+.entry-ribbon {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(214, 168, 85, 0.95),
+    transparent
+  );
+  filter: drop-shadow(0 0 14px rgba(214, 168, 85, 0.35));
+  animation: entryRibbon 1.6s ease-in-out infinite;
+}
+
+@keyframes entryRibbon {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: translateX(-50%) scaleX(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entry-shimmer,
+  .entry-sparkle,
+  .entry-ribbon {
+    animation: none !important;
+  }
+}
+
+.intro-hide {
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.intro-show {
+  opacity: 1;
+  transition: opacity 600ms ease;
+}
+
+/* =========================
+   Premium Music Toggle Animations
+========================= */
+
+.lux-music-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.82);
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.lux-music-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(214, 168, 85, 0.2);
+}
+
+.lux-music-btn.is-on {
+  box-shadow: 0 0 18px rgba(214, 168, 85, 0.18);
+  border-color: rgba(214, 168, 85, 0.32);
+}
+
+.lux-music-btn.is-off {
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
+.lux-music-btn.is-shake {
+  animation: luxShake 0.42s ease-in-out 1;
+}
+
+@keyframes luxShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  55% {
+    transform: translateX(2px);
+  }
+  80% {
+    transform: translateX(-1px);
+  }
+}
+
+.lux-music-iconWrap {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+}
+
+.lux-music-icon {
+  opacity: 0.92;
+}
+
+/* ON: glow + pulse */
+.lux-music-icon-on {
+  color: rgba(214, 168, 85, 0.95);
+  filter: drop-shadow(0 0 10px rgba(214, 168, 85, 0.35));
+  animation: luxPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes luxPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.88;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+
+/* OFF: muted + slash shimmer */
+.lux-music-icon-off {
+  color: rgba(255, 255, 255, 0.62);
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.1));
+}
+
+.lux-music-btn.is-off::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(214, 168, 85, 0) 45%,
+    rgba(214, 168, 85, 0.1) 50%,
+    rgba(214, 168, 85, 0) 55%,
+    transparent 100%
+  );
+  transform: translateX(-35%);
+  opacity: 0.55;
+  mix-blend-mode: screen;
+  animation: luxMuteShimmer 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes luxMuteShimmer {
+  0% {
+    transform: translateX(-45%);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateX(45%);
+    opacity: 0.25;
+  }
+  100% {
+    transform: translateX(45%);
+    opacity: 0;
+  }
+}
+
+/* Equalizer bars */
+.lux-eq {
+  position: absolute;
+  right: -10px;
+  bottom: -2px;
+  display: flex;
+  gap: 2px;
+  height: 12px;
+  align-items: flex-end;
+  opacity: 0.95;
+}
+
+.lux-eq-bar {
+  width: 2px;
+  border-radius: 2px;
+  background: rgba(214, 168, 85, 0.9);
+  filter: drop-shadow(0 0 8px rgba(214, 168, 85, 0.25));
+  transform-origin: bottom;
+}
+
+.lux-eq-bar.b1 {
+  animation: luxEq 650ms ease-in-out infinite;
+}
+.lux-eq-bar.b2 {
+  animation: luxEq 520ms ease-in-out infinite;
+}
+.lux-eq-bar.b3 {
+  animation: luxEq 780ms ease-in-out infinite;
+}
+
+@keyframes luxEq {
+  0%,
+  100% {
+    height: 3px;
+    opacity: 0.65;
+  }
+  50% {
+    height: 12px;
+    opacity: 1;
+  }
+}
+
+.lux-music-text {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Tooltip */
+.lux-music-tip {
+  position: absolute;
+  top: 46px;
+  right: 0;
+  max-width: 260px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.55);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .lux-music-icon-on,
+  .lux-eq-bar,
+  .lux-music-btn.is-off::before,
+  .lux-music-btn.is-shake {
+    animation: none !important;
+  }
+}
+
+.lux-music-text {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em; /* luxury tracking */
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.lux-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(214, 168, 85, 0.95);
+  box-shadow: 0 0 12px rgba(214, 168, 85, 0.45);
+  animation: luxLive 1.2s ease-in-out infinite;
+}
+
+@keyframes luxLive {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.65;
+  }
+  50% {
+    transform: scale(1.22);
+    opacity: 1;
+  }
+}
+
+.lux-muted-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
 }

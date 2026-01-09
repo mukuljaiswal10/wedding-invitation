@@ -444,7 +444,7 @@ export function RSVPModal({
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 placeholder="Enter name"
-                                className="mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-gold/40"
+                                className="mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[16px] sm:text-sm outline-none focus:ring-2 focus:ring-gold/40"
                             />
                         </div>
 
